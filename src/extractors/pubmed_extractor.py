@@ -1,8 +1,9 @@
 """Extrator de registros do PubMed via E-utilities (Biopython)."""
 
 import logging
+import re
 import time
-from typing import List
+from typing import List, Set
 
 from Bio import Entrez
 
@@ -27,6 +28,9 @@ DISASTERS_MESH = [
     '"Radioactive Hazard Release"[MeSH]',
     '"Mass Casualty Incidents"[MeSH]',
 ]
+
+# Environmental Pollution [N06.850.460] 
+
 
 DISASTERS_FREE = [
     "hurricane*[tiab]",
@@ -112,6 +116,17 @@ BATCH_SIZE = 500
 MAX_RETRIES = 5
 
 
+def _extract_mesh_name(term: str) -> str:
+    """Extrai nome limpo do MeSH: '"Disasters"[MeSH]' → 'Disasters'."""
+    m = re.search(r'"(.+?)"', term)
+    return m.group(1) if m else term
+
+
+DISASTERS_NAMES: Set[str] = {_extract_mesh_name(t) for t in DISASTERS_MESH}
+GESTATIONAL_NAMES: Set[str] = {_extract_mesh_name(t) for t in GESTATIONAL_MESH}
+NEONATAL_NAMES: Set[str] = {_extract_mesh_name(t) for t in NEONATAL_MESH}
+
+
 class PubMedExtractor(BaseExtractor):
     """Extrator de registros do PubMed usando NCBI E-utilities."""
 
@@ -124,11 +139,15 @@ class PubMedExtractor(BaseExtractor):
         self._rate_delay = 0.11 if config.api.pubmed.api_key else 0.34
         self._webenv = None
         self._query_key = None
+        # PMIDs por categoria (preenchidos via sub-buscas com MeSH explosion)
+        self._disaster_pmids: Set[str] = set()
+        self._gestational_pmids: Set[str] = set()
+        self._neonatal_pmids: Set[str] = set()
 
     def build_query(self) -> str:
         block1 = "(" + " OR ".join(DISASTERS_MESH) + ")"
-        block2 = "(" + " OR ".join(GESTATIONAL_MESH + GESTATIONAL_FREE) + ")"
-        block3 = "(" + " OR ".join(NEONATAL_MESH + NEONATAL_FREE) + ")"
+        block2 = "(" + " OR ".join(GESTATIONAL_MESH) + ")"
+        block3 = "(" + " OR ".join(NEONATAL_MESH) + ")"
 
         outcomes = f"({block2} OR {block3})"
         query = f"{block1} AND {outcomes}"
@@ -166,9 +185,47 @@ class PubMedExtractor(BaseExtractor):
         )
         return self.total_results
 
+    def _search_category_pmids(self) -> None:
+        """Executa sub-buscas para classificar PMIDs por categoria MeSH (com explosion)."""
+        dr = self.config.search.date_range
+        date_filter = f'("{dr.start}"[Date - Publication] : "{dr.end}"[Date - Publication])'
+        max_ret = self.config.search.max_results_per_db
+
+        block1 = "(" + " OR ".join(DISASTERS_MESH) + ")"
+        block2 = "(" + " OR ".join(GESTATIONAL_MESH) + ")"
+        block3 = "(" + " OR ".join(NEONATAL_MESH) + ")"
+        outcomes = f"({block2} OR {block3})"
+
+        queries = {
+            "disasters": f"{block1} AND {outcomes} AND {date_filter}",
+            "gestational": f"{block1} AND {block2} AND {date_filter}",
+            "neonatal": f"{block1} AND {block3} AND {date_filter}",
+        }
+
+        for label, query in queries.items():
+            try:
+                handle = Entrez.esearch(db="pubmed", term=query, retmax=max_ret)
+                results = Entrez.read(handle)
+                handle.close()
+                pmids = set(results.get("IdList", []))
+                if label == "disasters":
+                    self._disaster_pmids = pmids
+                elif label == "gestational":
+                    self._gestational_pmids = pmids
+                else:
+                    self._neonatal_pmids = pmids
+                logger.info("Sub-busca %s: %d PMIDs", label, len(pmids))
+                time.sleep(self._rate_delay)
+            except Exception as e:
+                logger.warning("Sub-busca %s falhou: %s", label, e)
+
     def fetch_records(self) -> List[BibRecord]:
         if self._webenv is None:
             self.search()
+
+        # Classificar PMIDs por categoria (usa MeSH explosion do PubMed)
+        logger.info("Executando sub-buscas por categoria MeSH...")
+        self._search_category_pmids()
 
         self.records = []
         total = min(self.total_results, self.config.search.max_results_per_db)
@@ -268,10 +325,28 @@ class PubMedExtractor(BaseExtractor):
 
         # MeSH terms
         mesh_terms = []
+        matched_disasters = []
+        matched_gestational = []
+        matched_neonatal = []
         for mesh in medline.get("MeshHeadingList", []):
             descriptor = mesh.get("DescriptorName", "")
             if descriptor:
-                mesh_terms.append(str(descriptor))
+                name = str(descriptor)
+                mesh_terms.append(name)
+                if name in DISASTERS_NAMES:
+                    matched_disasters.append(name)
+                if name in GESTATIONAL_NAMES:
+                    matched_gestational.append(name)
+                if name in NEONATAL_NAMES:
+                    matched_neonatal.append(name)
+
+        # Complementar com MeSH explosion (sub-busca por PMID)
+        if not matched_disasters and pmid in self._disaster_pmids:
+            matched_disasters = ["(MeSH explosion)"]
+        if not matched_gestational and pmid in self._gestational_pmids:
+            matched_gestational = ["(MeSH explosion)"]
+        if not matched_neonatal and pmid in self._neonatal_pmids:
+            matched_neonatal = ["(MeSH explosion)"]
 
         # Keywords
         keywords = []
@@ -314,6 +389,9 @@ class PubMedExtractor(BaseExtractor):
             abstract=abstract,
             keywords=keywords,
             mesh_terms=mesh_terms,
+            matched_disasters_mesh=matched_disasters,
+            matched_gestational_mesh=matched_gestational,
+            matched_neonatal_mesh=matched_neonatal,
             language=language,
             publication_type=pub_type,
             url=f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else None,

@@ -28,6 +28,11 @@ class BibRecord:
     keywords: List[str] = field(default_factory=list)
     mesh_terms: List[str] = field(default_factory=list)
 
+    # MeSH matching (termos do paper que correspondem aos critérios de busca)
+    matched_disasters_mesh: List[str] = field(default_factory=list)
+    matched_gestational_mesh: List[str] = field(default_factory=list)
+    matched_neonatal_mesh: List[str] = field(default_factory=list)
+
     # Metadados
     language: Optional[str] = None
     publication_type: Optional[str] = None

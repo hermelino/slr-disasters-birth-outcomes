@@ -22,7 +22,7 @@ from pathlib import Path
 
 from src.config import Config, load_config
 from src.dedup.deduplicator import deduplicate
-from src.exporters.csv_exporter import export_csv
+from src.exporters.csv_exporter import export_csv, export_excel
 from src.exporters.ris_exporter import export_ris
 from src.logging_prisma import (
     DatabaseStats,
@@ -263,6 +263,9 @@ def main():
         csv_path = str(output_dir / f"results_{timestamp}.csv")
         export_csv(unique_records, csv_path)
         prisma.output_csv = csv_path
+
+        xlsx_path = str(output_dir / f"results_{timestamp}.xlsx")
+        export_excel(unique_records, xlsx_path)
 
     if "ris" in config.output.formats:
         ris_path = str(output_dir / f"results_{timestamp}.ris")
