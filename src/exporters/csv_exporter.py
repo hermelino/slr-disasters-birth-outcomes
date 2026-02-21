@@ -42,7 +42,7 @@ def export_csv(records: List[BibRecord], output_path: str) -> str:
     df = pd.DataFrame(rows)
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_path, index=False, encoding="utf-8-sig")
+    df.to_csv(output_path, index=False, encoding="utf-8-sig", sep=";")
 
     logger.info("CSV exportado: %s (%d registros)", output_path, len(records))
     return output_path

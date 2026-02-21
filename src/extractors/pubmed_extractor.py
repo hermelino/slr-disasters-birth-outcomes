@@ -126,7 +126,7 @@ class PubMedExtractor(BaseExtractor):
         self._query_key = None
 
     def build_query(self) -> str:
-        block1 = "(" + " OR ".join(DISASTERS_MESH + DISASTERS_FREE) + ")"
+        block1 = "(" + " OR ".join(DISASTERS_MESH) + ")"
         block2 = "(" + " OR ".join(GESTATIONAL_MESH + GESTATIONAL_FREE) + ")"
         block3 = "(" + " OR ".join(NEONATAL_MESH + NEONATAL_FREE) + ")"
 
