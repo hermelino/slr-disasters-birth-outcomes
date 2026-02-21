@@ -11,6 +11,7 @@ Uso:
     python main.py --databases pubmed,bvs   # PubMed e BVS
     python main.py --verbose                # Logs detalhados no console
     python main.py --skip-dedup             # Exporta sem deduplicação
+    python main.py --import-bvs dados.ris   # Importa BVS exportado manualmente
 """
 
 import argparse
@@ -87,6 +88,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Ativa logs detalhados (DEBUG) no console",
     )
+    parser.add_argument(
+        "--import-bvs",
+        default=None,
+        metavar="ARQUIVO",
+        help="Importa registros BVS de arquivo RIS ou CSV exportado manualmente",
+    )
     return parser.parse_args()
 
 
@@ -124,6 +131,25 @@ def main():
             logger.error("Base de dados desconhecida: %s. Opções: %s", db, AVAILABLE_DATABASES)
             sys.exit(1)
 
+    # === Importação BVS manual ===
+    bvs_imported = []
+    if args.import_bvs:
+        from src.extractors.bvs_extractor import BvsExtractor
+        logger.info("=" * 50)
+        logger.info("Importando BVS de: %s", args.import_bvs)
+        logger.info("=" * 50)
+        try:
+            bvs_imported = BvsExtractor.import_from_file(args.import_bvs)
+            prisma.databases.append(DatabaseStats(
+                database_name="bvs",
+                search_query="(importado de arquivo)",
+                search_date=datetime.now().isoformat(),
+                records_identified=len(bvs_imported),
+                records_retrieved=len(bvs_imported),
+            ))
+        except Exception as e:
+            logger.error("Falha ao importar BVS: %s", e)
+
     # === Extração ===
     all_records = []
 
@@ -131,6 +157,11 @@ def main():
         logger.info("=" * 50)
         logger.info("Processando: %s", db_name.upper())
         logger.info("=" * 50)
+
+        # Se BVS já foi importado manualmente, apenas gerar query de referência
+        if db_name == "bvs" and bvs_imported:
+            logger.info("BVS já importado via --import-bvs (%d registros). Pulando.", len(bvs_imported))
+            continue
 
         try:
             extractor = create_extractor(db_name, config)
@@ -146,10 +177,29 @@ def main():
             print(f"  {db_name.upper()} — QUERY")
             print(f"{'=' * 50}")
             print(query)
+            if db_name == "bvs":
+                from src.extractors.bvs_extractor import BvsExtractor
+                if isinstance(extractor, BvsExtractor):
+                    print(f"\n  URL de busca:\n  {extractor.get_search_url()[:150]}...")
             print()
             continue
 
-        # Executar busca
+        # BVS: salvar query e instruções (sem tentar busca automática)
+        if db_name == "bvs":
+            from src.extractors.bvs_extractor import BvsExtractor
+            if isinstance(extractor, BvsExtractor):
+                extractor.save_query_file(str(output_dir))
+                extractor.print_manual_instructions()
+                prisma.databases.append(DatabaseStats(
+                    database_name="bvs",
+                    search_query=query,
+                    search_date=datetime.now().isoformat(),
+                    records_identified=0,
+                    records_retrieved=0,
+                ))
+                continue
+
+        # Executar busca (PubMed, Scopus)
         try:
             total = extractor.search()
         except Exception as e:
@@ -178,6 +228,9 @@ def main():
     if args.dry_run:
         logger.info("Modo dry-run: nenhuma busca executada.")
         return
+
+    # Adicionar registros BVS importados
+    all_records.extend(bvs_imported)
 
     prisma.total_identified = sum(db.records_identified for db in prisma.databases)
     prisma.total_retrieved = len(all_records)

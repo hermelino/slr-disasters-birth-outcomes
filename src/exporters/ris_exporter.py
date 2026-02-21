@@ -55,7 +55,7 @@ def _record_to_ris_entry(rec: BibRecord) -> dict:
         entry["issn"] = rec.issn
 
     if rec.url:
-        entry["url"] = rec.url
+        entry["urls"] = [rec.url]
 
     if rec.source_id:
         entry["accession_number"] = rec.source_id

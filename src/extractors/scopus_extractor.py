@@ -75,7 +75,7 @@ OUTCOMES_TERMS = [
 
 
 def _setup_pybliometrics(config: Config):
-    """Configura o pybliometrics com a API key antes do primeiro uso."""
+    """Configura o pybliometrics escrevendo o config file completo e chamando init()."""
     import configparser
     from pathlib import Path
 
@@ -83,31 +83,46 @@ def _setup_pybliometrics(config: Config):
     cfg_dir.mkdir(parents=True, exist_ok=True)
     cfg_path = cfg_dir / "pybliometrics.cfg"
 
-    cp = configparser.ConfigParser()
+    # Recriar do zero para evitar entradas duplicadas
     if cfg_path.exists():
-        cp.read(str(cfg_path))
+        cfg_path.unlink()
+    cp = configparser.ConfigParser()
 
+    # Authentication
     if "Authentication" not in cp:
         cp["Authentication"] = {}
     cp["Authentication"]["APIKey"] = config.api.scopus.api_key
     if config.api.scopus.institutional_token:
         cp["Authentication"]["InstToken"] = config.api.scopus.institutional_token
 
+    # Directories
     if "Directories" not in cp:
         cp["Directories"] = {}
     cache_dir = Path.home() / ".cache" / "pybliometrics"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    cp["Directories"]["AbstractDir"] = str(cache_dir / "abstract")
-    cp["Directories"]["AffiliationDir"] = str(cache_dir / "affiliation")
-    cp["Directories"]["AuthorDir"] = str(cache_dir / "author")
-    cp["Directories"]["CitationDir"] = str(cache_dir / "citation")
-    cp["Directories"]["SearchDir"] = str(cache_dir / "search")
-    cp["Directories"]["SerialDir"] = str(cache_dir / "serial")
+    for subdir in ["AbstractDir", "AffiliationDir", "AuthorDir", "CitationDir", "SearchDir", "SerialDir"]:
+        d = cache_dir / subdir.replace("Dir", "").lower()
+        d.mkdir(parents=True, exist_ok=True)
+        cp["Directories"][subdir] = str(d)
+
+    # Requests (exigido pelo pybliometrics v4+)
+    if "Requests" not in cp:
+        cp["Requests"] = {}
+    cp["Requests"].setdefault("Timeout", "20")
+    cp["Requests"].setdefault("Retries", "5")
 
     with open(cfg_path, "w") as f:
         cp.write(f)
 
-    logger.info("pybliometrics configurado em %s", cfg_path)
+    # Carregar o config no pybliometrics passando keys explicitamente
+    import pybliometrics
+
+    init_kwargs = {"config_path": str(cfg_path), "keys": [config.api.scopus.api_key]}
+    if config.api.scopus.institutional_token:
+        init_kwargs["inst_tokens"] = [config.api.scopus.institutional_token]
+    pybliometrics.init(**init_kwargs)
+
+    logger.info("pybliometrics configurado e inicializado em %s", cfg_path)
 
 
 class ScopusExtractor(BaseExtractor):
@@ -143,8 +158,13 @@ class ScopusExtractor(BaseExtractor):
         from pybliometrics.scopus import ScopusSearch
 
         logger.info("Executando busca no Scopus...")
-        s = ScopusSearch(self.search_query, download=False)
-        self.total_results = s.get_results_size()
+        try:
+            s = ScopusSearch(self.search_query, download=False, subscriber=False)
+            self.total_results = s.get_results_size()
+        except Exception as e:
+            logger.warning("Scopus subscriber=False falhou: %s. Tentando com subscriber=True...", e)
+            s = ScopusSearch(self.search_query, download=False)
+            self.total_results = s.get_results_size()
         logger.info("Scopus: %d registros encontrados", self.total_results)
         return self.total_results
 
@@ -165,7 +185,7 @@ class ScopusExtractor(BaseExtractor):
             self.records = self._fetch_by_year_ranges()
         else:
             logger.info("Scopus: recuperando %d registros...", total)
-            s = ScopusSearch(self.search_query, download=True)
+            s = ScopusSearch(self.search_query, download=True, subscriber=False)
             raw_results = s.results or []
             self.records = [self._parse_result(r) for r in raw_results]
 
@@ -194,7 +214,7 @@ class ScopusExtractor(BaseExtractor):
 
             logger.info("Scopus: buscando %d-%d...", y_start, y_end)
             try:
-                s = ScopusSearch(range_query, download=True)
+                s = ScopusSearch(range_query, download=True, subscriber=False)
                 raw = s.results or []
                 batch = [self._parse_result(r) for r in raw]
                 all_records.extend(batch)

@@ -81,7 +81,7 @@ def print_summary(prisma: PrismaLog) -> None:
         print(f"    Identificados: {db.records_identified}")
         print(f"    Recuperados:   {db.records_retrieved}")
 
-    print(f"\n  {'─' * 40}")
+    print(f"\n  {'-' * 40}")
     print(f"  Total identificados:     {prisma.total_identified}")
     print(f"  Total recuperados:       {prisma.total_retrieved}")
     print(f"  Duplicatas (DOI):        {prisma.duplicates_removed_doi}")
