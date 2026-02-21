@@ -1,0 +1,53 @@
+# ===========================================================================
+# Configuração do Extrator Bibliográfico
+# Desastres Ambientais × Indicadores Gestacionais/Neonatais
+# ===========================================================================
+# Copie este arquivo para config.yaml e preencha suas credenciais:
+#   cp config.example.yaml config.yaml
+
+# Credenciais de API
+api:
+  pubmed:
+    # OBRIGATÓRIO: email para identificação junto ao NCBI
+    email: "seu.email@universidade.edu.br"
+    # Opcional: API key do NCBI (aumenta rate limit de 3 para 10 req/s)
+    # Obter em: https://www.ncbi.nlm.nih.gov/account/settings/
+    api_key: ""
+    tool_name: "disaster_gestational_review"
+
+  scopus:
+    # API key do Elsevier (gratuita para uso acadêmico)
+    # Obter em: https://dev.elsevier.com/apikey/manage
+    # Pode usar variável de ambiente: "${SCOPUS_API_KEY}"
+    api_key: ""
+    institutional_token: ""
+
+  bvs:
+    # BVS/LILACS não requer autenticação
+    base_url: "https://pesquisa.bvsalud.org/portal/"
+
+# Parâmetros de busca
+search:
+  date_range:
+    start: "1990/01/01"
+    end: "2026/02/21"
+  # Filtro de idioma (vazio = todos os idiomas)
+  languages: []
+  # Limite máximo de registros por base de dados
+  max_results_per_db: 10000
+
+# Deduplicação
+dedup:
+  # Limiar de similaridade fuzzy para títulos (0-100)
+  fuzzy_threshold: 90
+  # Normalizar títulos antes da comparação (remover acentos, pontuação)
+  title_normalization: true
+
+# Saída
+output:
+  directory: "output"
+  formats:
+    - csv
+    - ris
+  # Adicionar timestamp ao subdiretório de saída
+  timestamp: true
