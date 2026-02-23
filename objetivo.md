@@ -3,14 +3,20 @@ Para essa problemática — efeitos de desastres ambientais em indicadores gesta
 Bases de dados primárias.
 
 PubMed/MEDLINE — indispensável para estudos epidemiológicos e clínicos sobre mortalidade materna, infantil e prematuridade associadas a desastres
+
 Web of Science — boa cobertura multidisciplinar, útil para cruzar com literatura econômica e ambiental
+
 Scopus — ampla cobertura em ciências da saúde e ambientais, com boas ferramentas de análise bibliométrica
+
 EMBASE — forte em farmacologia e saúde pública, complementa o PubMed
+
 
 Bases com foco em países de renda média-baixa e América Latina
 
 LILACS (BVS) — fundamental para literatura brasileira e latino-americana, incluindo o contexto do SUS
+
 SciELO — acesso aberto com boa cobertura de periódicos brasileiros e regionais
+
 REPIDISCA (PAHO/OPAS) — repositório especializado em saúde ambiental nas Américas
 
 Bases interdisciplinares relevantes

@@ -28,10 +28,16 @@ class BvsConfig:
 
 
 @dataclass
+class WosConfig:
+    api_key: str = ""
+
+
+@dataclass
 class ApiConfig:
     pubmed: PubMedConfig = field(default_factory=PubMedConfig)
     scopus: ScopusConfig = field(default_factory=ScopusConfig)
     bvs: BvsConfig = field(default_factory=BvsConfig)
+    wos: WosConfig = field(default_factory=WosConfig)
 
 
 @dataclass
@@ -126,6 +132,10 @@ def load_config(config_path: str = "config.yaml") -> Config:
     bvs = api_raw.get("bvs", {})
     config.api.bvs = BvsConfig(
         base_url=bvs.get("base_url", "https://pesquisa.bvsalud.org/portal/"),
+    )
+    wos = api_raw.get("wos", {})
+    config.api.wos = WosConfig(
+        api_key=wos.get("api_key", ""),
     )
 
     # Search

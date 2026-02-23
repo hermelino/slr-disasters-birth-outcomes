@@ -26,6 +26,12 @@ api:
     # BVS/LILACS não requer autenticação
     base_url: "https://pesquisa.bvsalud.org/portal/"
 
+  wos:
+    # API key do Web of Science (Clarivate Starter API)
+    # Obter em: https://developer.clarivate.com/apis/wos-starter
+    # Pode usar variável de ambiente: "${WOS_API_KEY}"
+    api_key: ""
+
 # Parâmetros de busca
 search:
   date_range:

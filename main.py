@@ -35,7 +35,7 @@ from src.models import BibRecord
 
 logger = logging.getLogger(__name__)
 
-AVAILABLE_DATABASES = ["pubmed", "scopus", "bvs"]
+AVAILABLE_DATABASES = ["pubmed", "scopus", "bvs", "wos"]
 
 
 def create_extractor(db_name: str, config: Config):
@@ -49,6 +49,9 @@ def create_extractor(db_name: str, config: Config):
     elif db_name == "bvs":
         from src.extractors.bvs_extractor import BvsExtractor
         return BvsExtractor(config)
+    elif db_name == "wos":
+        from src.extractors.wos_extractor import WosExtractor
+        return WosExtractor(config)
     else:
         raise ValueError(f"Base de dados desconhecida: {db_name}")
 
@@ -93,6 +96,18 @@ def parse_args() -> argparse.Namespace:
         default=None,
         metavar="ARQUIVO",
         help="Importa registros BVS de arquivo RIS ou CSV exportado manualmente",
+    )
+    parser.add_argument(
+        "--import-scopus",
+        default=None,
+        metavar="ARQUIVO",
+        help="Importa registros Scopus de arquivo CSV ou RIS exportado manualmente",
+    )
+    parser.add_argument(
+        "--import-wos",
+        default=None,
+        metavar="ARQUIVO",
+        help="Importa registros WoS de arquivo RIS ou Tab-delimited exportado manualmente",
     )
     return parser.parse_args()
 
@@ -150,8 +165,47 @@ def main():
         except Exception as e:
             logger.error("Falha ao importar BVS: %s", e)
 
+    # === Importação Scopus manual ===
+    scopus_imported = []
+    if args.import_scopus:
+        from src.extractors.scopus_extractor import ScopusExtractor
+        logger.info("=" * 50)
+        logger.info("Importando Scopus de: %s", args.import_scopus)
+        logger.info("=" * 50)
+        try:
+            scopus_imported = ScopusExtractor.import_from_file(args.import_scopus)
+            prisma.databases.append(DatabaseStats(
+                database_name="scopus",
+                search_query="(importado de arquivo)",
+                search_date=datetime.now().isoformat(),
+                records_identified=len(scopus_imported),
+                records_retrieved=len(scopus_imported),
+            ))
+        except Exception as e:
+            logger.error("Falha ao importar Scopus: %s", e)
+
+    # === Importação WoS manual ===
+    wos_imported = []
+    if args.import_wos:
+        from src.extractors.wos_extractor import WosExtractor
+        logger.info("=" * 50)
+        logger.info("Importando WoS de: %s", args.import_wos)
+        logger.info("=" * 50)
+        try:
+            wos_imported = WosExtractor.import_from_file(args.import_wos)
+            prisma.databases.append(DatabaseStats(
+                database_name="wos",
+                search_query="(importado de arquivo)",
+                search_date=datetime.now().isoformat(),
+                records_identified=len(wos_imported),
+                records_retrieved=len(wos_imported),
+            ))
+        except Exception as e:
+            logger.error("Falha ao importar WoS: %s", e)
+
     # === Extração ===
     all_records = []
+    records_by_db = {}  # {db_name: [BibRecord, ...]}
 
     for db_name in databases:
         logger.info("=" * 50)
@@ -161,6 +215,16 @@ def main():
         # Se BVS já foi importado manualmente, apenas gerar query de referência
         if db_name == "bvs" and bvs_imported:
             logger.info("BVS já importado via --import-bvs (%d registros). Pulando.", len(bvs_imported))
+            continue
+
+        # Se Scopus já foi importado manualmente, pular
+        if db_name == "scopus" and scopus_imported:
+            logger.info("Scopus já importado via --import-scopus (%d registros). Pulando.", len(scopus_imported))
+            continue
+
+        # Se WoS já foi importado manualmente, pular
+        if db_name == "wos" and wos_imported:
+            logger.info("WoS já importado via --import-wos (%d registros). Pulando.", len(wos_imported))
             continue
 
         try:
@@ -180,7 +244,16 @@ def main():
             if db_name == "bvs":
                 from src.extractors.bvs_extractor import BvsExtractor
                 if isinstance(extractor, BvsExtractor):
+                    extractor.save_query_file(str(output_dir))
                     print(f"\n  URL de busca:\n  {extractor.get_search_url()[:150]}...")
+            if db_name == "scopus":
+                from src.extractors.scopus_extractor import ScopusExtractor
+                if isinstance(extractor, ScopusExtractor):
+                    extractor.save_query_file(str(output_dir))
+            if db_name == "wos":
+                from src.extractors.wos_extractor import WosExtractor
+                if isinstance(extractor, WosExtractor):
+                    extractor.save_query_file(str(output_dir))
             print()
             continue
 
@@ -199,7 +272,37 @@ def main():
                 ))
                 continue
 
-        # Executar busca (PubMed, Scopus)
+        # Scopus sem API key: salvar query e instruções para exportação manual
+        if db_name == "scopus":
+            from src.extractors.scopus_extractor import ScopusExtractor
+            if isinstance(extractor, ScopusExtractor) and not extractor._has_api_key:
+                extractor.save_query_file(str(output_dir))
+                extractor.print_manual_instructions()
+                prisma.databases.append(DatabaseStats(
+                    database_name="scopus",
+                    search_query=query,
+                    search_date=datetime.now().isoformat(),
+                    records_identified=0,
+                    records_retrieved=0,
+                ))
+                continue
+
+        # WoS sem API key: salvar query e instruções para exportação manual
+        if db_name == "wos":
+            from src.extractors.wos_extractor import WosExtractor
+            if isinstance(extractor, WosExtractor) and not extractor._has_api_key:
+                extractor.save_query_file(str(output_dir))
+                extractor.print_manual_instructions()
+                prisma.databases.append(DatabaseStats(
+                    database_name="wos",
+                    search_query=query,
+                    search_date=datetime.now().isoformat(),
+                    records_identified=0,
+                    records_retrieved=0,
+                ))
+                continue
+
+        # Executar busca (PubMed, Scopus, WoS)
         try:
             total = extractor.search()
         except Exception as e:
@@ -214,6 +317,7 @@ def main():
             records = extractor.records  # parcialmente recuperados
 
         all_records.extend(records)
+        records_by_db[db_name] = records
 
         # Estatísticas PRISMA
         stats = extractor.get_prisma_stats()
@@ -229,13 +333,35 @@ def main():
         logger.info("Modo dry-run: nenhuma busca executada.")
         return
 
-    # Adicionar registros BVS importados
+    # Adicionar registros importados manualmente
     all_records.extend(bvs_imported)
+    if bvs_imported:
+        records_by_db["bvs"] = bvs_imported
+    all_records.extend(scopus_imported)
+    if scopus_imported:
+        records_by_db["scopus"] = scopus_imported
+    all_records.extend(wos_imported)
+    if wos_imported:
+        records_by_db["wos"] = wos_imported
 
     prisma.total_identified = sum(db.records_identified for db in prisma.databases)
     prisma.total_retrieved = len(all_records)
 
     logger.info("Total de registros recuperados: %d", len(all_records))
+
+    # === Exportação individual por base ===
+    for db_name, db_records in records_by_db.items():
+        if not db_records:
+            continue
+        if "csv" in config.output.formats:
+            db_csv = str(output_dir / f"{db_name}_{timestamp}.csv")
+            export_csv(db_records, db_csv)
+            db_xlsx = str(output_dir / f"{db_name}_{timestamp}.xlsx")
+            export_excel(db_records, db_xlsx)
+        if "ris" in config.output.formats:
+            db_ris = str(output_dir / f"{db_name}_{timestamp}.ris")
+            export_ris(db_records, db_ris)
+        logger.info("%s: %d registros exportados individualmente", db_name.upper(), len(db_records))
 
     # === Deduplicação ===
     if args.skip_dedup:

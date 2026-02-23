@@ -3,7 +3,7 @@
 import logging
 import re
 import time
-from typing import List, Set
+from typing import Dict, List, Set
 
 from Bio import Entrez
 
@@ -219,6 +219,158 @@ class PubMedExtractor(BaseExtractor):
             except Exception as e:
                 logger.warning("Sub-busca %s falhou: %s", label, e)
 
+    def _fetch_mesh_trees_batch(self, term_names: Set[str]) -> Dict[str, List[str]]:
+        """
+        Obtém tree numbers para um conjunto de descritores MeSH via E-utilities.
+        Retorna {term_name: [tree_numbers]}.
+        """
+        if not term_names:
+            return {}
+
+        result: Dict[str, List[str]] = {}
+        names_list = sorted(term_names)
+
+        # Batch esearch: grupos de 50 termos por query
+        all_uids: List[str] = []
+        es_batch = 50
+        for i in range(0, len(names_list), es_batch):
+            batch = names_list[i : i + es_batch]
+            query = " OR ".join(f'"{n}"[MeSH Terms]' for n in batch)
+            try:
+                handle = Entrez.esearch(
+                    db="mesh", term=query, retmax=len(batch) * 2
+                )
+                res = Entrez.read(handle)
+                handle.close()
+                all_uids.extend(res.get("IdList", []))
+                time.sleep(self._rate_delay)
+            except Exception as e:
+                logger.warning("MeSH esearch batch falhou: %s", e)
+
+        all_uids = list(set(all_uids))
+        if not all_uids:
+            return result
+
+        # Batch efetch: grupos de 200 UIDs, formato texto legível
+        # Formato: "1: TermName\n...\nTree Number(s): X.Y.Z, A.B.C\n..."
+        heading_re = re.compile(r"^\d+:\s+(.+)$")
+        tree_re = re.compile(r"^Tree Number\(s\):\s+(.+)$")
+
+        ef_batch = 200
+        for i in range(0, len(all_uids), ef_batch):
+            batch = all_uids[i : i + ef_batch]
+            try:
+                handle = Entrez.efetch(
+                    db="mesh", id=",".join(batch),
+                    rettype="full", retmode="text",
+                )
+                text = handle.read()
+                handle.close()
+                if isinstance(text, bytes):
+                    text = text.decode("utf-8")
+                time.sleep(self._rate_delay)
+
+                current_mh = None
+                for line in text.split("\n"):
+                    stripped = line.strip()
+                    hm = heading_re.match(stripped)
+                    if hm:
+                        current_mh = hm.group(1).strip()
+                        continue
+                    tm = tree_re.match(stripped)
+                    if tm and current_mh and current_mh in term_names:
+                        trees = [t.strip() for t in tm.group(1).split(",")]
+                        result[current_mh] = trees
+            except Exception as e:
+                logger.warning("MeSH efetch batch falhou: %s", e)
+
+        logger.info(
+            "Tree numbers obtidos para %d/%d termos MeSH",
+            len(result), len(term_names),
+        )
+        return result
+
+    def _resolve_mesh_explosions(self) -> None:
+        """
+        Substitui marcadores '(MeSH explosion)' pelos nomes reais dos
+        descritores MeSH descendentes, usando a hierarquia de tree numbers.
+        """
+        # 1) Tree numbers dos nossos termos de busca
+        search_names = DISASTERS_NAMES | GESTATIONAL_NAMES | NEONATAL_NAMES
+        logger.info(
+            "Resolvendo MeSH explosion: obtendo tree numbers para %d termos de busca...",
+            len(search_names),
+        )
+        search_trees = self._fetch_mesh_trees_batch(search_names)
+
+        # prefix → categoria
+        prefix_map: Dict[str, str] = {}
+        for name in DISASTERS_NAMES:
+            for tn in search_trees.get(name, []):
+                prefix_map[tn] = "disasters"
+        for name in GESTATIONAL_NAMES:
+            for tn in search_trees.get(name, []):
+                prefix_map[tn] = "gestational"
+        for name in NEONATAL_NAMES:
+            for tn in search_trees.get(name, []):
+                prefix_map[tn] = "neonatal"
+
+        if not prefix_map:
+            logger.warning("Nenhum tree number encontrado — explosion não resolvido")
+            return
+
+        # 2) Coletar termos únicos dos artigos com marcador explosion
+        terms_to_resolve: Set[str] = set()
+        for rec in self.records:
+            has_expl = (
+                "(MeSH explosion)" in rec.matched_disasters_mesh
+                or "(MeSH explosion)" in rec.matched_gestational_mesh
+                or "(MeSH explosion)" in rec.matched_neonatal_mesh
+            )
+            if has_expl:
+                terms_to_resolve.update(rec.mesh_terms)
+        terms_to_resolve -= search_names
+
+        if not terms_to_resolve:
+            return
+
+        logger.info(
+            "Obtendo tree numbers para %d termos de artigos...",
+            len(terms_to_resolve),
+        )
+        article_trees = self._fetch_mesh_trees_batch(terms_to_resolve)
+
+        # 3) Mapear cada termo de artigo → categorias que ele descende
+        descendant_cats: Dict[str, Set[str]] = {}
+        for term, trees in article_trees.items():
+            for tn in trees:
+                for prefix, category in prefix_map.items():
+                    if tn == prefix or tn.startswith(prefix + "."):
+                        descendant_cats.setdefault(term, set()).add(category)
+
+        # 4) Atualizar registros
+        resolved = 0
+        for rec in self.records:
+            for attr, cat in [
+                ("matched_disasters_mesh", "disasters"),
+                ("matched_gestational_mesh", "gestational"),
+                ("matched_neonatal_mesh", "neonatal"),
+            ]:
+                matched = getattr(rec, attr)
+                if "(MeSH explosion)" in matched:
+                    names = [
+                        t for t in rec.mesh_terms
+                        if t in descendant_cats and cat in descendant_cats[t]
+                    ]
+                    if names:
+                        setattr(rec, attr, names)
+                        resolved += 1
+
+        logger.info(
+            "MeSH explosion resolvido: %d campos atualizados, %d termos descendentes identificados",
+            resolved, len(descendant_cats),
+        )
+
     def fetch_records(self) -> List[BibRecord]:
         if self._webenv is None:
             self.search()
@@ -241,6 +393,9 @@ class PubMedExtractor(BaseExtractor):
                 len(self.records),
             )
             time.sleep(self._rate_delay)
+
+        # Resolver "(MeSH explosion)" → nomes reais dos descendentes
+        self._resolve_mesh_explosions()
 
         logger.info("PubMed: %d registros recuperados no total", len(self.records))
         return self.records
