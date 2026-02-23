@@ -46,7 +46,7 @@ Repositórios da OMS, UNICEF, UNFPA, Ministério da Saúde (DATASUS) e Defesa Ci
 (Bloco 1: Desastres) AND (Bloco 2: Desfechos gestacionais e neonatais)
 ```
 
-Filtro temporal: 2000–2025
+Filtro temporal: 1990–2026
 
 ## Bloco 1 — Desastres ambientais
 
