@@ -3,8 +3,10 @@
 import logging
 import re
 import time
+from pathlib import Path
 from typing import Dict, List, Set
 
+import rispy
 from Bio import Entrez
 
 from src.config import Config
@@ -143,6 +145,92 @@ class PubMedExtractor(BaseExtractor):
         self._disaster_pmids: Set[str] = set()
         self._gestational_pmids: Set[str] = set()
         self._neonatal_pmids: Set[str] = set()
+
+    @staticmethod
+    def import_from_file(file_path: str) -> List[BibRecord]:
+        """Importa registros PubMed de arquivo RIS exportado anteriormente."""
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Arquivo não encontrado: {file_path}")
+
+        suffix = path.suffix.lower()
+        if suffix == ".ris":
+            return PubMedExtractor._import_ris(path)
+        else:
+            raise ValueError(
+                f"Formato não suportado: {suffix}. Use .ris exportado do PubMed."
+            )
+
+    @staticmethod
+    def _import_ris(path: Path) -> List[BibRecord]:
+        """Importa registros de arquivo RIS exportado do PubMed."""
+        logger.info("Importando RIS do PubMed: %s", path)
+
+        entries = None
+        for encoding in ["utf-8-sig", "utf-8", "latin-1", "cp1252"]:
+            try:
+                with open(path, "r", encoding=encoding) as f:
+                    entries = rispy.load(f)
+                break
+            except (UnicodeDecodeError, UnicodeError):
+                continue
+
+        if entries is None:
+            raise ValueError(f"Não foi possível ler {path} com nenhum encoding suportado")
+
+        records = []
+        for entry in entries:
+            doi = entry.get("doi")
+            if not doi:
+                urls = entry.get("urls", [])
+                for u in urls:
+                    doi_match = re.search(r'10\.\d{4,}/[^\s]+', u)
+                    if doi_match:
+                        doi = doi_match.group(0)
+                        break
+
+            year = None
+            year_str = entry.get("year", "")
+            if year_str:
+                try:
+                    year = int(str(year_str)[:4])
+                except ValueError:
+                    pass
+
+            pages = None
+            sp = entry.get("start_page", "")
+            ep = entry.get("end_page", "")
+            if sp:
+                pages = f"{sp}-{ep}" if ep else sp
+
+            url = None
+            urls = entry.get("urls", [])
+            if urls:
+                url = urls[0]
+
+            rec = BibRecord(
+                source_db="pubmed",
+                source_id=entry.get("accession_number", ""),
+                doi=doi,
+                title=entry.get("title", entry.get("primary_title", "")),
+                authors=entry.get("authors", entry.get("first_authors", [])),
+                journal=entry.get("secondary_title", entry.get("journal_name", "")),
+                year=year,
+                volume=entry.get("volume", None),
+                issue=entry.get("number", None),
+                pages=pages,
+                issn=entry.get("issn", None),
+                abstract=entry.get("abstract", ""),
+                keywords=entry.get("keywords", []),
+                mesh_terms=[],
+                language=entry.get("language", None),
+                publication_type=entry.get("type_of_reference", None),
+                url=url,
+            )
+            records.append(rec)
+
+        logger.info("PubMed RIS: %d registros importados de %s", len(records), path.name)
+        return records
 
     def build_query(self) -> str:
         block1 = "(" + " OR ".join(DISASTERS_MESH) + ")"
