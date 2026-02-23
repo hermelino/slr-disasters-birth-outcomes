@@ -1,0 +1,8 @@
+2026-02-22 21:43:12 [INFO] __main__: Iniciando extração bibliográfica
+2026-02-22 21:43:12 [INFO] __main__: Diretório de saída: output\20260222_214312
+2026-02-22 21:43:12 [INFO] __main__: ==================================================
+2026-02-22 21:43:12 [INFO] __main__: Processando: BVS
+2026-02-22 21:43:12 [INFO] __main__: ==================================================
+2026-02-22 21:43:12 [INFO] src.extractors.bvs_extractor: Query BVS construída (1493 caracteres)
+2026-02-22 21:43:12 [INFO] src.extractors.bvs_extractor: Query BVS salva em: output\20260222_214312\bvs_query.txt
+2026-02-22 21:43:12 [INFO] __main__: Modo dry-run: nenhuma busca executada.

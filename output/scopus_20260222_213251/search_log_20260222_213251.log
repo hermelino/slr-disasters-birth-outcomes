@@ -1,0 +1,9 @@
+2026-02-22 21:32:51 [INFO] __main__: Iniciando extração bibliográfica
+2026-02-22 21:32:51 [INFO] __main__: Diretório de saída: output\20260222_213251
+2026-02-22 21:32:51 [INFO] __main__: ==================================================
+2026-02-22 21:32:51 [INFO] __main__: Processando: SCOPUS
+2026-02-22 21:32:51 [INFO] __main__: ==================================================
+2026-02-22 21:32:51 [INFO] src.extractors.scopus_extractor: pybliometrics configurado e inicializado em C:\Users\herme\.config\pybliometrics.cfg
+2026-02-22 21:32:51 [INFO] src.extractors.scopus_extractor: Query Scopus construída (1110 caracteres)
+2026-02-22 21:32:51 [INFO] src.extractors.scopus_extractor: Query Scopus salva em: output\20260222_213251\scopus_query.txt
+2026-02-22 21:32:51 [INFO] __main__: Modo dry-run: nenhuma busca executada.

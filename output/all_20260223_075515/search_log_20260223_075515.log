@@ -1,0 +1,44 @@
+2026-02-23 07:55:15 [INFO] __main__: Iniciando extração bibliográfica
+2026-02-23 07:55:15 [INFO] __main__: Diretório de saída: output\20260223_075515
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] __main__: Importando PubMed de: output/20260223_074843/pubmed_20260223_074843.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] src.extractors.pubmed_extractor: Importando RIS do PubMed: output\20260223_074843\pubmed_20260223_074843.ris
+2026-02-23 07:55:15 [INFO] src.extractors.pubmed_extractor: PubMed RIS: 3116 registros importados de pubmed_20260223_074843.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] __main__: Importando BVS de: output/bvs_20260222_214312/bvs_export.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] src.extractors.bvs_extractor: Importando RIS da BVS: output\bvs_20260222_214312\bvs_export.ris
+2026-02-23 07:55:15 [INFO] src.extractors.bvs_extractor: BVS RIS: 21 registros importados de bvs_export.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] __main__: Importando Scopus de: output/scopus_20260222_213251/scopus_export.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] src.extractors.scopus_extractor: Importando RIS do Scopus: output\scopus_20260222_213251\scopus_export.ris
+2026-02-23 07:55:15 [INFO] src.extractors.scopus_extractor: Scopus RIS: 1439 registros importados de scopus_export.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] __main__: Importando WoS de: output/wos_20260222_213650/wos_export.ris
+2026-02-23 07:55:15 [INFO] __main__: ==================================================
+2026-02-23 07:55:15 [INFO] src.extractors.wos_extractor: Importando RIS do WoS: output\wos_20260222_213650\wos_export.ris
+2026-02-23 07:55:15 [INFO] src.extractors.wos_extractor: WoS RIS: 518 registros importados de wos_export.ris
+2026-02-23 07:55:15 [INFO] __main__: Total de registros recuperados: 5094
+2026-02-23 07:55:15 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260223_075515\pubmed_20260223_075515.csv (3116 registros)
+2026-02-23 07:55:15 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260223_075515\pubmed_20260223_075515.ris (3116 registros)
+2026-02-23 07:55:15 [INFO] __main__: PUBMED: 3116 registros exportados individualmente
+2026-02-23 07:55:15 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260223_075515\bvs_20260223_075515.csv (21 registros)
+2026-02-23 07:55:15 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260223_075515\bvs_20260223_075515.ris (21 registros)
+2026-02-23 07:55:15 [INFO] __main__: BVS: 21 registros exportados individualmente
+2026-02-23 07:55:15 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260223_075515\scopus_20260223_075515.csv (1439 registros)
+2026-02-23 07:55:15 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260223_075515\scopus_20260223_075515.ris (1439 registros)
+2026-02-23 07:55:15 [INFO] __main__: SCOPUS: 1439 registros exportados individualmente
+2026-02-23 07:55:15 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260223_075515\wos_20260223_075515.csv (518 registros)
+2026-02-23 07:55:15 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260223_075515\wos_20260223_075515.ris (518 registros)
+2026-02-23 07:55:15 [INFO] __main__: WOS: 518 registros exportados individualmente
+2026-02-23 07:55:15 [INFO] __main__: Iniciando deduplicação...
+2026-02-23 07:55:15 [INFO] src.dedup.deduplicator: Fase 1 (DOI): 679 duplicatas identificadas
+2026-02-23 07:55:17 [INFO] src.dedup.deduplicator: Fase 2 (fuzzy): 69 duplicatas identificadas
+2026-02-23 07:55:17 [INFO] src.dedup.deduplicator: Deduplicação concluída: 4346 únicos, 748 duplicatas (DOI=679, fuzzy=69)
+2026-02-23 07:55:18 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260223_075515\results_20260223_075515.csv (4346 registros)
+2026-02-23 07:55:18 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260223_075515\results_20260223_075515.ris (4346 registros)
+2026-02-23 07:55:18 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260223_075515\duplicates_20260223_075515.csv (748 registros)
+2026-02-23 07:55:18 [INFO] __main__: Duplicatas exportadas: output\20260223_075515\duplicates_20260223_075515.csv
+2026-02-23 07:55:18 [INFO] __main__: Extração concluída com sucesso.

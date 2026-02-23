@@ -1,0 +1,29 @@
+Web of Science — Query de Busca (Fielded Search)
+============================================================
+
+LINHA 1 — Topic (copiar e colar no 1º campo):
+------------------------------------------------------------
+disaster OR "natural disaster" OR flood OR earthquake OR hurricane OR typhoon OR tornado OR wildfire OR tsunami OR drought OR cyclone OR "chemical spill" OR "oil spill" OR "volcanic eruption" OR landslide OR mudslide OR "nuclear accident" OR "dam failure" OR "dam collapse" OR "mining disaster" OR "environmental disaster" OR "climate disaster" OR "mass casualty"
+
+LINHA 2 — Topic (copiar e colar no 2º campo, operador AND):
+------------------------------------------------------------
+"pregnancy outcome" OR "pregnancy complication" OR "premature birth" OR "preterm birth" OR "preterm delivery" OR "low birth weight" OR "small for gestational age" OR "spontaneous abortion" OR stillbirth OR preeclampsia OR pre-eclampsia OR eclampsia OR "fetal death" OR "birth weight" OR "maternal mortality" OR miscarriage OR "gestational diabetes" OR "gestational hypertension" OR "intrauterine growth restriction" OR "infant mortality" OR "neonatal mortality" OR "perinatal mortality" OR "Apgar score" OR "congenital abnormalities" OR "congenital anomalies" OR "birth defect" OR NICU OR "neonatal intensive care" OR "neonatal death" OR "infant death" OR "neonatal outcome"
+
+DATE RANGE: 1990 - 2026
+(usar botão '+ Add date range')
+
+============================================================
+Instruções:
+  1. Abra: https://www-webofscience-com.ez11.periodicos.capes.gov.br/wos/woscc/smart-search
+  2. Aba 'FIELDED SEARCH'
+  3. Linha 1: dropdown 'Topic', cole a LINHA 1 acima
+  4. Clique '+ Add row', operador AND
+  5. Linha 2: dropdown 'Topic', cole a LINHA 2 acima
+  6. Clique '+ Add date range', defina 1990 a 2026
+  7. Clique 'Search'
+  8. Exporte como RIS (Full Record)
+  9. Use: python main.py --import-wos arquivo.ris
+
+============================================================
+Query completa (formato API, para referência):
+TS=(disaster OR "natural disaster" OR flood OR earthquake OR hurricane OR typhoon OR tornado OR wildfire OR tsunami OR drought OR cyclone OR "chemical spill" OR "oil spill" OR "volcanic eruption" OR landslide OR mudslide OR "nuclear accident" OR "dam failure" OR "dam collapse" OR "mining disaster" OR "environmental disaster" OR "climate disaster" OR "mass casualty") AND TS=("pregnancy outcome" OR "pregnancy complication" OR "premature birth" OR "preterm birth" OR "preterm delivery" OR "low birth weight" OR "small for gestational age" OR "spontaneous abortion" OR stillbirth OR preeclampsia OR pre-eclampsia OR eclampsia OR "fetal death" OR "birth weight" OR "maternal mortality" OR miscarriage OR "gestational diabetes" OR "gestational hypertension" OR "intrauterine growth restriction" OR "infant mortality" OR "neonatal mortality" OR "perinatal mortality" OR "Apgar score" OR "congenital abnormalities" OR "congenital anomalies" OR "birth defect" OR NICU OR "neonatal intensive care" OR "neonatal death" OR "infant death" OR "neonatal outcome") AND PY=(1990-2026)

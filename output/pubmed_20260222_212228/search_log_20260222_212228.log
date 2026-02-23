@@ -1,0 +1,42 @@
+2026-02-22 21:22:28 [INFO] __main__: Iniciando extração bibliográfica
+2026-02-22 21:22:28 [INFO] __main__: Diretório de saída: output\20260222_212228
+2026-02-22 21:22:28 [INFO] __main__: ==================================================
+2026-02-22 21:22:28 [INFO] __main__: Processando: PUBMED
+2026-02-22 21:22:28 [INFO] __main__: ==================================================
+2026-02-22 21:22:28 [INFO] src.extractors.pubmed_extractor: Query PubMed construída (1000 caracteres)
+2026-02-22 21:22:28 [INFO] src.extractors.pubmed_extractor: Executando busca no PubMed...
+2026-02-22 21:22:33 [INFO] src.extractors.pubmed_extractor: PubMed: 3116 registros encontrados (WebEnv=MCID_699b9dc80597568..., QueryKey=1)
+2026-02-22 21:22:33 [INFO] src.extractors.pubmed_extractor: Executando sub-buscas por categoria MeSH...
+2026-02-22 21:22:36 [INFO] src.extractors.pubmed_extractor: Sub-busca disasters: 3116 PMIDs
+2026-02-22 21:22:39 [INFO] src.extractors.pubmed_extractor: Sub-busca gestational: 2164 PMIDs
+2026-02-22 21:22:42 [INFO] src.extractors.pubmed_extractor: Sub-busca neonatal: 1245 PMIDs
+2026-02-22 21:22:42 [INFO] src.extractors.pubmed_extractor: Recuperando 3116 registros do PubMed em lotes de 500...
+2026-02-22 21:22:48 [INFO] src.extractors.pubmed_extractor: PubMed: lote 0-500 recuperado (500 registros acumulados)
+2026-02-22 21:22:53 [INFO] src.extractors.pubmed_extractor: PubMed: lote 500-1000 recuperado (1000 registros acumulados)
+2026-02-22 21:22:59 [INFO] src.extractors.pubmed_extractor: PubMed: lote 1000-1500 recuperado (1500 registros acumulados)
+2026-02-22 21:23:02 [INFO] src.extractors.pubmed_extractor: PubMed: lote 1500-2000 recuperado (2000 registros acumulados)
+2026-02-22 21:23:09 [INFO] src.extractors.pubmed_extractor: PubMed: lote 2000-2500 recuperado (2500 registros acumulados)
+2026-02-22 21:23:14 [INFO] src.extractors.pubmed_extractor: PubMed: lote 2500-3000 recuperado (3000 registros acumulados)
+2026-02-22 21:23:17 [INFO] src.extractors.pubmed_extractor: PubMed: lote 3000-3116 recuperado (3116 registros acumulados)
+2026-02-22 21:23:17 [INFO] src.extractors.pubmed_extractor: Resolvendo MeSH explosion: obtendo tree numbers para 32 termos de busca...
+2026-02-22 21:23:23 [INFO] src.extractors.pubmed_extractor: Tree numbers obtidos para 32/32 termos MeSH
+2026-02-22 21:23:23 [INFO] src.extractors.pubmed_extractor: Obtendo tree numbers para 4186 termos de artigos...
+2026-02-22 21:29:54 [INFO] src.extractors.pubmed_extractor: Tree numbers obtidos para 4186/4186 termos MeSH
+2026-02-22 21:29:54 [INFO] src.extractors.pubmed_extractor: MeSH explosion resolvido: 4472 campos atualizados, 244 termos descendentes identificados
+2026-02-22 21:29:54 [INFO] src.extractors.pubmed_extractor: PubMed: 3116 registros recuperados no total
+2026-02-22 21:29:54 [INFO] __main__: Total de registros recuperados: 3116
+2026-02-22 21:29:54 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260222_212228\pubmed_20260222_212228.csv (3116 registros)
+2026-02-22 21:29:56 [INFO] src.exporters.csv_exporter: Excel exportado: output\20260222_212228\pubmed_20260222_212228.xlsx (3116 registros, 2 abas)
+2026-02-22 21:29:56 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260222_212228\pubmed_20260222_212228.ris (3116 registros)
+2026-02-22 21:29:56 [INFO] __main__: PUBMED: 3116 registros exportados individualmente
+2026-02-22 21:29:56 [INFO] __main__: Iniciando deduplicação...
+2026-02-22 21:29:56 [INFO] src.dedup.deduplicator: Fase 1 (DOI): 0 duplicatas identificadas
+2026-02-22 21:29:57 [INFO] src.dedup.deduplicator: Fase 2 (fuzzy): 15 duplicatas identificadas
+2026-02-22 21:29:57 [INFO] src.dedup.deduplicator: Deduplicação concluída: 3101 únicos, 15 duplicatas (DOI=0, fuzzy=15)
+2026-02-22 21:29:57 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260222_212228\results_20260222_212228.csv (3101 registros)
+2026-02-22 21:29:58 [INFO] src.exporters.csv_exporter: Excel exportado: output\20260222_212228\results_20260222_212228.xlsx (3101 registros, 2 abas)
+2026-02-22 21:29:58 [INFO] src.exporters.ris_exporter: RIS exportado: output\20260222_212228\results_20260222_212228.ris (3101 registros)
+2026-02-22 21:29:58 [INFO] src.exporters.csv_exporter: CSV exportado: output\20260222_212228\duplicates_20260222_212228.csv (15 registros)
+2026-02-22 21:29:58 [INFO] __main__: Duplicatas exportadas: output\20260222_212228\duplicates_20260222_212228.csv
+2026-02-22 21:29:58 [INFO] src.logging_prisma: PRISMA log salvo: output\20260222_212228\prisma_log_20260222_212228.json
+2026-02-22 21:29:58 [INFO] __main__: Extração concluída com sucesso.

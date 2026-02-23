@@ -1,0 +1,60 @@
+BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=BVS/LILACS — Query de Busca
+=
+
+Query:
+(mh:"Desastres" OR mh:"Desastres Naturais" OR mh:"Inundações" OR mh:"Terremotos" OR mh:"Tempestades Ciclônicas" OR mh:"Tsunamis" OR mh:"Erupções Vulcânicas" OR mh:"Incêndios Florestais" OR mh:"Secas" OR mh:"Liberação de Riscos Químicos" OR mh:"Liberação de Riscos Radioativos" OR mh:"Incidentes com Feridos em Massa" OR tw:hurricane OR tw:typhoon OR tw:tornado OR tw:flood OR tw:earthquake OR tw:wildfire OR tw:tsunami OR tw:drought OR tw:cyclone OR tw:landslide OR tw:"oil spill" OR tw:"chemical spill" OR tw:"desastre ambiental" OR tw:"rompimento de barragem" OR tw:"desastre minerário" OR tw:"dam collapse" OR tw:"mining disaster") AND ((mh:"Resultado da Gravidez" OR mh:"Complicações na Gravidez" OR mh:"Nascimento Prematuro" OR mh:"Recém-Nascido de Baixo Peso" OR mh:"Aborto Espontâneo" OR mh:"Natimorto" OR mh:"Pré-Eclâmpsia" OR mh:"Eclampsia" OR mh:"Morte Fetal" OR mh:"Peso ao Nascer" OR mh:"Mortalidade Materna" OR tw:"nascimento prematuro" OR tw:"baixo peso ao nascer" OR tw:"preterm birth" OR tw:"low birth weight" OR tw:"pregnancy outcome" OR tw:miscarriage OR tw:stillbirth OR tw:preeclampsia) OR (mh:"Mortalidade Infantil" OR mh:"Mortalidade Neonatal" OR mh:"Mortalidade Perinatal" OR mh:"Índice de Apgar" OR mh:"Terapia Intensiva Neonatal" OR mh:"Anormalidades Congênitas" OR tw:"mortalidade infantil" OR tw:"mortalidade neonatal" OR tw:"infant mortality" OR tw:"neonatal mortality" OR tw:"neonatal death" OR tw:NICU OR tw:APGAR OR tw:"birth defect" OR tw:"congenital anomaly"))
+
+URL de busca (abrir no navegador):
+https://pesquisa.bvsalud.org/portal/?q=%28mh%3A%22Desastres%22+OR+mh%3A%22Desastres+Naturais%22+OR+mh%3A%22Inunda%C3%A7%C3%B5es%22+OR+mh%3A%22Terremotos%22+OR+mh%3A%22Tempestades+Cicl%C3%B4nicas%22+OR+mh%3A%22Tsunamis%22+OR+mh%3A%22Erup%C3%A7%C3%B5es+Vulc%C3%A2nicas%22+OR+mh%3A%22Inc%C3%AAndios+Florestais%22+OR+mh%3A%22Secas%22+OR+mh%3A%22Libera%C3%A7%C3%A3o+de+Riscos+Qu%C3%ADmicos%22+OR+mh%3A%22Libera%C3%A7%C3%A3o+de+Riscos+Radioativos%22+OR+mh%3A%22Incidentes+com+Feridos+em+Massa%22+OR+tw%3Ahurricane+OR+tw%3Atyphoon+OR+tw%3Atornado+OR+tw%3Aflood+OR+tw%3Aearthquake+OR+tw%3Awildfire+OR+tw%3Atsunami+OR+tw%3Adrought+OR+tw%3Acyclone+OR+tw%3Alandslide+OR+tw%3A%22oil+spill%22+OR+tw%3A%22chemical+spill%22+OR+tw%3A%22desastre+ambiental%22+OR+tw%3A%22rompimento+de+barragem%22+OR+tw%3A%22desastre+miner%C3%A1rio%22+OR+tw%3A%22dam+collapse%22+OR+tw%3A%22mining+disaster%22%29+AND+%28%28mh%3A%22Resultado+da+Gravidez%22+OR+mh%3A%22Complica%C3%A7%C3%B5es+na+Gravidez%22+OR+mh%3A%22Nascimento+Prematuro%22+OR+mh%3A%22Rec%C3%A9m-Nascido+de+Baixo+Peso%22+OR+mh%3A%22Aborto+Espont%C3%A2neo%22+OR+mh%3A%22Natimorto%22+OR+mh%3A%22Pr%C3%A9-Ecl%C3%A2mpsia%22+OR+mh%3A%22Eclampsia%22+OR+mh%3A%22Morte+Fetal%22+OR+mh%3A%22Peso+ao+Nascer%22+OR+mh%3A%22Mortalidade+Materna%22+OR+tw%3A%22nascimento+prematuro%22+OR+tw%3A%22baixo+peso+ao+nascer%22+OR+tw%3A%22preterm+birth%22+OR+tw%3A%22low+birth+weight%22+OR+tw%3A%22pregnancy+outcome%22+OR+tw%3Amiscarriage+OR+tw%3Astillbirth+OR+tw%3Apreeclampsia%29+OR+%28mh%3A%22Mortalidade+Infantil%22+OR+mh%3A%22Mortalidade+Neonatal%22+OR+mh%3A%22Mortalidade+Perinatal%22+OR+mh%3A%22%C3%8Dndice+de+Apgar%22+OR+mh%3A%22Terapia+Intensiva+Neonatal%22+OR+mh%3A%22Anormalidades+Cong%C3%AAnitas%22+OR+tw%3A%22mortalidade+infantil%22+OR+tw%3A%22mortalidade+neonatal%22+OR+tw%3A%22infant+mortality%22+OR+tw%3A%22neonatal+mortality%22+OR+tw%3A%22neonatal+death%22+OR+tw%3ANICU+OR+tw%3AAPGAR+OR+tw%3A%22birth+defect%22+OR+tw%3A%22congenital+anomaly%22%29%29&lang=en&filter[db][]=LILACS
+
+Filtro: db=LILACS
+Instruções: exporte em formato RIS e use --import-bvs

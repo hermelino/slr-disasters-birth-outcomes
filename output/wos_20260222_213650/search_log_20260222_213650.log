@@ -1,0 +1,8 @@
+2026-02-22 21:36:50 [INFO] __main__: Iniciando extração bibliográfica
+2026-02-22 21:36:50 [INFO] __main__: Diretório de saída: output\20260222_213650
+2026-02-22 21:36:50 [INFO] __main__: ==================================================
+2026-02-22 21:36:50 [INFO] __main__: Processando: WOS
+2026-02-22 21:36:50 [INFO] __main__: ==================================================
+2026-02-22 21:36:50 [INFO] src.extractors.wos_extractor: Query WoS construída (1071 caracteres)
+2026-02-22 21:36:50 [INFO] src.extractors.wos_extractor: Query WoS salva em: output\20260222_213650\wos_query.txt
+2026-02-22 21:36:50 [INFO] __main__: Modo dry-run: nenhuma busca executada.

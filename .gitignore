@@ -1,8 +1,6 @@
 # Credenciais e configuração com API keys
 config.yaml
 
-# Diretório de saída
-output/
 
 # Python
 __pycache__/
