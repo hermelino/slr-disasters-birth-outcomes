@@ -152,7 +152,7 @@ des_ambientais_e_ind_gestacionais/
 |-- config.example.yaml              # Exemplo de configuracao (sem credenciais)
 |-- requirements.txt                 # Dependencias Python
 |
-|-- ESTRATEGIA_BUSCA.md              # Este arquivo
+|-- README.md                         # Este arquivo (estrategia de busca)
 |-- ACESSO_BASES.md                  # Instrucoes de acesso a cada base de dados
 |
 |-- src/
