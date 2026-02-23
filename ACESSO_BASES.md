@@ -95,9 +95,7 @@ O pipeline executa a busca e recupera os registros automaticamente.
    python main.py --databases scopus
    ```
 
-**Nota:** Via API sem assinatura institucional, abstract e autores podem
-ficar vazios. O pipeline tenta enriquecer via AbstractRetrieval (mais lento).
-A Opcao A (manual) garante dados completos.
+**Nota:** Via API sem assinatura institucional, abstract e autores podem ficar vazios. O pipeline tenta enriquecer via AbstractRetrieval (mais lento). A Opcao A (manual) garante dados completos.
 
 ---
 
@@ -205,7 +203,15 @@ python main.py --databases pubmed,scopus
 ### Importando bases manuais junto com automaticas
 
 ```bash
+python main.py --databases pubmed --import-scopus output/scopus_20260222_213251/scopus_export.ris --import-bvs output/bvs_20260222_214312/bvs_export.ris --import-wos output/wos_20260222_213650/wos_export.ris
+
 python main.py --databases pubmed --import-scopus scopus_export.csv --import-bvs bvs_export.ris --import-wos wos_export.ris
+```
+
+### Importando todas as bases de RIS (sem busca online)
+
+```bash
+python main.py --databases "" --import-pubmed output/pubmed_20260222_212228/pubmed_20260222_212228.ris --import-scopus output/scopus_20260222_213251/scopus_export.ris --import-bvs output/bvs_20260222_214312/bvs_export.ris --import-wos output/wos_20260222_213650/wos_export.ris
 ```
 
 ### Apenas gerar queries (sem executar buscas)
@@ -214,8 +220,7 @@ python main.py --databases pubmed --import-scopus scopus_export.csv --import-bvs
 python main.py --dry-run
 ```
 
-Isso gera os arquivos `scopus_query.txt`, `wos_query.txt` e `bvs_query.txt`
-no diretorio de saida para uso manual nas respectivas interfaces web.
+Isso gera os arquivos `scopus_query.txt`, `wos_query.txt` e `bvs_query.txt` no diretorio de saida para uso manual nas respectivas interfaces web.
 
 ### Exportar sem deduplicacao
 
