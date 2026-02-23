@@ -23,13 +23,12 @@ from pathlib import Path
 
 from src.config import Config, load_config
 from src.dedup.deduplicator import deduplicate
-from src.exporters.csv_exporter import export_csv, export_excel
+from src.exporters.csv_exporter import export_csv
 from src.exporters.ris_exporter import export_ris
 from src.logging_prisma import (
     DatabaseStats,
     PrismaLog,
     print_summary,
-    save_prisma_log,
     setup_logging,
 )
 from src.models import BibRecord
@@ -390,8 +389,6 @@ def main():
         if "csv" in config.output.formats:
             db_csv = str(output_dir / f"{db_name}_{timestamp}.csv")
             export_csv(db_records, db_csv)
-            db_xlsx = str(output_dir / f"{db_name}_{timestamp}.xlsx")
-            export_excel(db_records, db_xlsx)
         if "ris" in config.output.formats:
             db_ris = str(output_dir / f"{db_name}_{timestamp}.ris")
             export_ris(db_records, db_ris)
@@ -424,9 +421,6 @@ def main():
         export_csv(unique_records, csv_path)
         prisma.output_csv = csv_path
 
-        xlsx_path = str(output_dir / f"results_{timestamp}.xlsx")
-        export_excel(unique_records, xlsx_path)
-
     if "ris" in config.output.formats:
         ris_path = str(output_dir / f"results_{timestamp}.ris")
         export_ris(unique_records, ris_path)
@@ -438,12 +432,8 @@ def main():
         export_csv(duplicate_records, dupes_csv_path)
         logger.info("Duplicatas exportadas: %s", dupes_csv_path)
 
-    # === PRISMA log ===
-    prisma.execution_end = datetime.now().isoformat()
-    prisma_path = str(output_dir / f"prisma_log_{timestamp}.json")
-    save_prisma_log(prisma, prisma_path)
-
     # === Resumo ===
+    prisma.execution_end = datetime.now().isoformat()
     print_summary(prisma)
 
     logger.info("Extração concluída com sucesso.")
