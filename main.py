@@ -12,6 +12,7 @@ Uso:
     python main.py --verbose                # Logs detalhados no console
     python main.py --skip-dedup             # Exporta sem deduplicação
     python main.py --import-bvs dados.ris   # Importa BVS exportado manualmente
+    python main.py --import-pubmed pub.ris  # Importa PubMed de RIS já exportado
 """
 
 import argparse
@@ -109,6 +110,12 @@ def parse_args() -> argparse.Namespace:
         metavar="ARQUIVO",
         help="Importa registros WoS de arquivo RIS ou Tab-delimited exportado manualmente",
     )
+    parser.add_argument(
+        "--import-pubmed",
+        default=None,
+        metavar="ARQUIVO",
+        help="Importa registros PubMed de arquivo RIS exportado anteriormente",
+    )
     return parser.parse_args()
 
 
@@ -140,11 +147,30 @@ def main():
     prisma = PrismaLog(execution_start=datetime.now().isoformat())
 
     # Determinar bases de dados
-    databases = [db.strip().lower() for db in args.databases.split(",")]
+    databases = [db.strip().lower() for db in args.databases.split(",") if db.strip()]
     for db in databases:
         if db not in AVAILABLE_DATABASES:
             logger.error("Base de dados desconhecida: %s. Opções: %s", db, AVAILABLE_DATABASES)
             sys.exit(1)
+
+    # === Importação PubMed manual ===
+    pubmed_imported = []
+    if args.import_pubmed:
+        from src.extractors.pubmed_extractor import PubMedExtractor
+        logger.info("=" * 50)
+        logger.info("Importando PubMed de: %s", args.import_pubmed)
+        logger.info("=" * 50)
+        try:
+            pubmed_imported = PubMedExtractor.import_from_file(args.import_pubmed)
+            prisma.databases.append(DatabaseStats(
+                database_name="pubmed",
+                search_query="(importado de arquivo)",
+                search_date=datetime.now().isoformat(),
+                records_identified=len(pubmed_imported),
+                records_retrieved=len(pubmed_imported),
+            ))
+        except Exception as e:
+            logger.error("Falha ao importar PubMed: %s", e)
 
     # === Importação BVS manual ===
     bvs_imported = []
@@ -211,6 +237,11 @@ def main():
         logger.info("=" * 50)
         logger.info("Processando: %s", db_name.upper())
         logger.info("=" * 50)
+
+        # Se PubMed já foi importado manualmente, pular
+        if db_name == "pubmed" and pubmed_imported:
+            logger.info("PubMed já importado via --import-pubmed (%d registros). Pulando.", len(pubmed_imported))
+            continue
 
         # Se BVS já foi importado manualmente, apenas gerar query de referência
         if db_name == "bvs" and bvs_imported:
@@ -334,6 +365,9 @@ def main():
         return
 
     # Adicionar registros importados manualmente
+    all_records.extend(pubmed_imported)
+    if pubmed_imported:
+        records_by_db["pubmed"] = pubmed_imported
     all_records.extend(bvs_imported)
     if bvs_imported:
         records_by_db["bvs"] = bvs_imported
