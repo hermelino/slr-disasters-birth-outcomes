@@ -208,6 +208,17 @@ class PubMedExtractor(BaseExtractor):
             if urls:
                 url = urls[0]
 
+            # Extrair MeSH terms do campo notes_abstract (formato: "MeSH: term1; term2")
+            mesh_terms = []
+            notes = entry.get("notes_abstract", "")
+            if isinstance(notes, str) and notes.startswith("MeSH: "):
+                mesh_terms = [t.strip() for t in notes[6:].split(";") if t.strip()]
+
+            # Matching MeSH por categoria
+            matched_disasters = [t for t in mesh_terms if t in DISASTERS_NAMES]
+            matched_gestational = [t for t in mesh_terms if t in GESTATIONAL_NAMES]
+            matched_neonatal = [t for t in mesh_terms if t in NEONATAL_NAMES]
+
             rec = BibRecord(
                 source_db="pubmed",
                 source_id=entry.get("accession_number", ""),
@@ -222,7 +233,10 @@ class PubMedExtractor(BaseExtractor):
                 issn=entry.get("issn", None),
                 abstract=entry.get("abstract", ""),
                 keywords=entry.get("keywords", []),
-                mesh_terms=[],
+                mesh_terms=mesh_terms,
+                matched_disasters_mesh=matched_disasters,
+                matched_gestational_mesh=matched_gestational,
+                matched_neonatal_mesh=matched_neonatal,
                 language=entry.get("language", None),
                 publication_type=entry.get("type_of_reference", None),
                 url=url,

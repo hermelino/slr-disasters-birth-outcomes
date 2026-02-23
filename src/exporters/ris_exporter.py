@@ -48,6 +48,9 @@ def _record_to_ris_entry(rec: BibRecord) -> dict:
     if rec.keywords:
         entry["keywords"] = list(rec.keywords)
 
+    if rec.mesh_terms:
+        entry["notes_abstract"] = "MeSH: " + "; ".join(rec.mesh_terms)
+
     if rec.language:
         entry["language"] = rec.language
 

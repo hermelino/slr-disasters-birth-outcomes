@@ -1,5 +1,6 @@
 """Exportador de registros bibliográficos para CSV e Excel."""
 
+import csv
 import logging
 import re
 from collections import Counter
@@ -147,7 +148,8 @@ def export_csv(records: List[BibRecord], output_path: str) -> str:
     df = _build_dataframe(records)
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_path, index=False, encoding="utf-8-sig", sep=";")
+    df.to_csv(output_path, index=False, encoding="utf-8-sig", sep=";",
+              quoting=csv.QUOTE_ALL)
 
     logger.info("CSV exportado: %s (%d registros)", output_path, len(records))
     return output_path
