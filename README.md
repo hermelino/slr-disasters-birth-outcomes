@@ -91,9 +91,11 @@ Data da execução: 2026-02-22/23
 |---|---|
 | Total identificados | 5.094 |
 | Duplicatas por DOI | 679 |
-| Duplicatas por similaridade (fuzzy) | 68 |
-| **Total duplicatas removidas** | **747** |
-| **Registros únicos após deduplicação** | **4.347** |
+| Duplicatas por similaridade (fuzzy) | 69 |
+| **Total duplicatas removidas** | **748** |
+| Registros após deduplicação | 4.346 |
+| Removidos manualmente (dados fora do padrão) | 1 |
+| **Registros para triagem** | **4.345** |
 
 ### Fluxo PRISMA
 
@@ -105,12 +107,19 @@ Identificação (n = 5.094)
     BVS:        21
         |
         v
-Duplicatas removidas (n = 747)
+Duplicatas removidas (n = 748)
     DOI exato:        679
-    Título similar:    68
+    Título similar:    69
         |
         v
-Registros para triagem (n = 4.347)
+Registros após deduplicação (n = 4.346)
+        |
+        v
+Removidos manualmente (n = 1)
+    Dados fora do padrão (abstract com texto completo do artigo)
+        |
+        v
+Registros para triagem (n = 4.345)
 ```
 
 ---
